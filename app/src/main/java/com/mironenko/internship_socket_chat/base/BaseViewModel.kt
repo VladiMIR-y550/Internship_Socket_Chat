@@ -6,13 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mironenko.internship_socket_chat.util.delegate
+import com.mironenko.internship_socket_chat.util.network.CheckNetworkStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 abstract class BaseViewModel<State, Action>(
     private val interactors: Set<Interactor<State, Action>>,
-    private val reducer: Reducer<State, Action>
+    private val reducer: Reducer<State, Action>,
+    private val networkStatus: CheckNetworkStatus
 ) : ViewModel() {
 
     private val mutableState = MutableLiveData(reducer.initialState)

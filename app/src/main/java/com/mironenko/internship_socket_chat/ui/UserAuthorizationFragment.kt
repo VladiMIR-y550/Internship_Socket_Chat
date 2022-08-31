@@ -1,4 +1,4 @@
-package com.mironenko.internship_socket_chat.screens.login
+package com.mironenko.internship_socket_chat.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,12 +23,8 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (savedInstanceState == null) {
-            viewModel.connectToServer()
-        }
-
-        binding.btnSingIn.setOnClickListener {
-
+        viewModel.state.observe(viewLifecycleOwner) {
+            binding.tvInput.text = it.message
         }
     }
 }

@@ -12,5 +12,5 @@ import dagger.hilt.components.SingletonComponent
 interface ChatSocketBindingsModule {
 
     @Binds
-    fun bindUserChatSocket(ChatSocketClient: ChatSocketClient): ChatSocket
+    fun bindUserChatSocket(chatSocketClient: ChatSocketClient): ChatSocket
 }

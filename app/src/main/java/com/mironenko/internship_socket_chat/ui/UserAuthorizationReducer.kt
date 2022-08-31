@@ -1,4 +1,4 @@
-package com.mironenko.internship_socket_chat.screens.login
+package com.mironenko.internship_socket_chat.ui
 
 import com.mironenko.internship_socket_chat.base.Reducer
 import javax.inject.Inject
@@ -7,7 +7,7 @@ class UserAuthorizationReducer @Inject constructor() :
     Reducer<UserAuthorizationState, UserAuthorizationAction> {
 
     override val initialState = UserAuthorizationState(
-        isSocketConnected = false
+        message = ""
     )
 
     override fun reduce(
@@ -16,9 +16,16 @@ class UserAuthorizationReducer @Inject constructor() :
     ): UserAuthorizationState {
         return when (action) {
             UserAuthorizationAction.None -> state
-            UserAuthorizationAction.ConnectToServer -> state
-            UserAuthorizationAction.ServerConnected -> state
-            is UserAuthorizationAction.Error -> state
+            is UserAuthorizationAction.ConnectToServer -> state.copy(
+                message = "Loading..."
+            )
+            is UserAuthorizationAction.ServerConnected -> state.copy(
+                message = action.connectionStatus
+            )
+
+            is UserAuthorizationAction.Error -> state.copy(
+                message = action.error.toString()
+            )
         }
     }
 }

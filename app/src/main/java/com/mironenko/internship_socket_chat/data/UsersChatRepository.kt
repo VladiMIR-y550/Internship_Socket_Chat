@@ -7,7 +7,7 @@ class UsersChatRepository @Inject constructor(
     private val chatSocket: ChatSocket,
 ) : ChatRepository {
 
-    override fun connectToSocket() {
-        chatSocket.getSocketAddressByUdp()
+    override suspend fun connectToSocket(): String {
+        return chatSocket.getSocketAddressByUdp()
     }
 }
