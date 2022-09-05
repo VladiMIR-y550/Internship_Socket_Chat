@@ -1,6 +1,5 @@
 package com.mironenko.internship_socket_chat.data.interactor
 
-import android.util.Log
 import com.mironenko.internship_socket_chat.base.SideEffectInteractor
 import com.mironenko.internship_socket_chat.data.ChatRepository
 import com.mironenko.internship_socket_chat.ui.UserAuthorizationAction
@@ -16,10 +15,8 @@ class AuthStatusInteractor @Inject constructor(
     override val sideEffectFlow: Flow<UserAuthorizationAction>
         get() = chatRepository.isAuthorized.map {
             if (it) {
-                Log.d("TAG", "Action.Authorized")
                 UserAuthorizationAction.Authorized
             } else {
-                Log.d("TAG", "Action.UnAuthorized")
                 UserAuthorizationAction.UnAuthorized
             }
         }
@@ -28,15 +25,16 @@ class AuthStatusInteractor @Inject constructor(
         state: UserAuthorizationState,
         action: UserAuthorizationAction
     ): UserAuthorizationAction {
-       return when (action) {
-           UserAuthorizationAction.UnAuthorized -> {
-               UserAuthorizationAction.Authorization
-           }
-            is UserAuthorizationAction.NetworkAvailable -> {
-                UserAuthorizationAction.ConnectToServer
+        return when (action) {
+            UserAuthorizationAction.ConnectToServer -> {
+                try {
+                    UserAuthorizationAction.ServerStatus(chatRepository.connectToServer())
+                } catch (e: Exception) {
+                    UserAuthorizationAction.Error(e)
+                }
             }
-            is UserAuthorizationAction.NetworkUnavailable -> {
-                UserAuthorizationAction.DisconnectServer
+            UserAuthorizationAction.UnAuthorized -> {
+                UserAuthorizationAction.SingIn
             }
             else -> UserAuthorizationAction.Error(
                 IllegalArgumentException("Wrong Action $action")
@@ -46,8 +44,7 @@ class AuthStatusInteractor @Inject constructor(
 
     override fun canHandle(action: UserAuthorizationAction): Boolean {
         return when (action) {
-            is UserAuthorizationAction.NetworkAvailable -> true
-            is UserAuthorizationAction.NetworkUnavailable -> true
+            is UserAuthorizationAction.ConnectToServer -> true
             is UserAuthorizationAction.UnAuthorized -> true
             else -> false
         }

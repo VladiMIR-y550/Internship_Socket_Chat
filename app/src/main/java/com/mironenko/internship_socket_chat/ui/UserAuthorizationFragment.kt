@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.mironenko.internship_socket_chat.base.BaseFragment
 import com.mironenko.internship_socket_chat.databinding.FragmentUserAuthorizationBinding
@@ -26,20 +27,8 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
         viewModel.state.observe(viewLifecycleOwner) {
             binding.tvAuthStatus.text = it.authStatus
             binding.tvInput.text = it.message
-            if (!it.isInternetAvailable) {
-                binding.tvInternetConnection.visibility = View.VISIBLE
-            } else {
-                binding.tvInternetConnection.visibility = View.GONE
-            }
-            if (it.isProgress) {
-                binding.pbAuthProgress.visibility = View.VISIBLE
-            } else {
-                binding.pbAuthProgress.visibility = View.INVISIBLE
-            }
-        }
-
-        binding.btnSingIn.setOnClickListener {
-            viewModel.authorization()
+            binding.tvInternetConnection.isVisible = it.isInternetAvailable
+            binding.pbAuthProgress.isVisible = it.isProgress
         }
     }
 }

@@ -13,12 +13,4 @@ class UsersChatRepository @Inject constructor(
     override suspend fun connectToServer(): String {
         return chatSocket.connectToServerUdp()
     }
-
-    override fun disconnectServer() {
-        chatSocket.disconnect()
-    }
-
-    override suspend fun authorization() {
-        TODO("Not yet implemented")
-    }
 }

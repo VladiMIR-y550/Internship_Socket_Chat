@@ -13,13 +13,11 @@ class UserAuthorizationReducer @Inject constructor() :
         action: UserAuthorizationAction
     ): UserAuthorizationState {
         return when (action) {
-            UserAuthorizationAction.Authorization -> state
+            UserAuthorizationAction.SingIn -> state
 
             //Side effect
-            UserAuthorizationAction.None -> state.copy(
-                message = "Please input your Login",
-                isProgress = false
-            )
+            UserAuthorizationAction.None -> state
+
             UserAuthorizationAction.Authorized -> state.copy(
                 authStatus = "Authorized"
             )
@@ -29,20 +27,11 @@ class UserAuthorizationReducer @Inject constructor() :
             UserAuthorizationAction.ConnectToServer -> state.copy(
                 isProgress = true
             )
-            UserAuthorizationAction.DisconnectServer -> state.copy(
-                message = "Server disconnected",
-                isProgress = false
-            )
             is UserAuthorizationAction.ServerStatus -> state.copy(
                 message = action.serverAddress,
                 isProgress = false
             )
-            is UserAuthorizationAction.NetworkAvailable -> state.copy(
-                isInternetAvailable = action.isInternetAvailable
-            )
-            is UserAuthorizationAction.NetworkUnavailable -> state.copy(
-                isInternetAvailable = action.isInternetAvailable
-            )
+
             is UserAuthorizationAction.Error -> state.copy(
                 message = action.error.toString()
             )

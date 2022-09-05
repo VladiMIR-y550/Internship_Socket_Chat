@@ -5,6 +5,4 @@ import kotlinx.coroutines.flow.Flow
 interface ChatRepository {
     val isAuthorized: Flow<Boolean>
     suspend fun connectToServer(): String
-    suspend fun authorization()
-    fun disconnectServer()
 }
