@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mironenko.internship_socket_chat.ui.UserAuthorizationAction
 import com.mironenko.internship_socket_chat.util.delegate
 import com.mironenko.internship_socket_chat.util.network.CheckNetworkStatus
+import com.mironenko.internship_socket_chat.util.network.NetworkStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -20,6 +23,19 @@ abstract class BaseViewModel<State, Action>(
     private val mutableState = MutableLiveData(reducer.initialState)
     private var stateValue by mutableState.delegate()
     val state: LiveData<State> = mutableState
+
+    init {
+        viewModelScope.launch {
+            flowOf(
+                *interactors.filterIsInstance<SideEffectInteractor<State, Action>>().map {
+                    it.sideEffectFlow
+                }.toTypedArray()
+            ).flattenConcat()
+                .collectLatest {
+                    action(it)
+                }
+        }
+    }
 
     @MainThread
     protected fun action(action: Action) {

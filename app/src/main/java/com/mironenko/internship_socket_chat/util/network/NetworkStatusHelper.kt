@@ -5,14 +5,12 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.util.Log
 import androidx.annotation.RequiresPermission
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.*
 import java.net.InetSocketAddress
 import java.net.Socket
 import javax.inject.Inject
@@ -21,6 +19,12 @@ class NetworkStatusHelper @Inject constructor(
     context: Context
 ) : CheckNetworkStatus {
 
+//    init {
+//        CoroutineScope(Dispatchers.Main).launch {
+//            getNetworkStatusChat(context = context)
+//        }
+//    }
+
     override val getNetworkStatus: Flow<NetworkStatus.Status> =
         getNetworkStatusChat(context = context)
 
@@ -28,6 +32,7 @@ class NetworkStatusHelper @Inject constructor(
     @RequiresPermission("android.permission.ACCESS_NETWORK_STATE")
     private fun getNetworkStatusChat(context: Context): Flow<NetworkStatus.Status> {
         return callbackFlow {
+//            Log.d("TAG","NetworkStatus Started")
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -36,6 +41,7 @@ class NetworkStatusHelper @Inject constructor(
 
                 override fun onUnavailable() {
                     availabilityCheckJob?.cancel()
+//                    Log.d("TAG","NetworkStatus NetworkStatus.Status.UNAVAILABLE")
                     trySend(NetworkStatus.Status.UNAVAILABLE)
                 }
 
@@ -43,8 +49,10 @@ class NetworkStatusHelper @Inject constructor(
                     availabilityCheckJob = launch {
                         send(
                             if (checkAvailability()) {
+//                                Log.d("TAG","NetworkStatus NetworkStatus.Status.AVAILABLE")
                                 NetworkStatus.Status.AVAILABLE
                             } else {
+//                                Log.d("TAG","NetworkStatus NetworkStatus.Status.AVAILABLE")
                                 NetworkStatus.Status.UNAVAILABLE
                             }
                         )
@@ -53,6 +61,7 @@ class NetworkStatusHelper @Inject constructor(
 
                 override fun onLost(network: Network) {
                     availabilityCheckJob?.cancel()
+//                    Log.d("TAG","NetworkStatus NetworkStatus.Status.UNAVAILABLE")
                     trySend(NetworkStatus.Status.UNAVAILABLE)
                 }
             }
@@ -63,7 +72,7 @@ class NetworkStatusHelper @Inject constructor(
 
             connectivityManager.registerNetworkCallback(request, callback)
             awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
-        }
+        }.buffer(Channel.CONFLATED)     //удалить
     }
 
     private suspend fun checkAvailability(): Boolean {

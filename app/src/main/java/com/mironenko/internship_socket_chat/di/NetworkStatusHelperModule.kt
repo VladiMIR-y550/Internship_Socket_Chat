@@ -1,6 +1,7 @@
 package com.mironenko.internship_socket_chat.di
 
 import android.content.Context
+import com.mironenko.internship_socket_chat.util.network.CheckNetworkStatus
 import com.mironenko.internship_socket_chat.util.network.NetworkStatusHelper
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 class NetworkStatusHelperModule {
 
     @Provides
-    fun provideNetworkStatusHelper(@ApplicationContext context: Context): NetworkStatusHelper {
+    fun provideNetworkStatusHelper(@ApplicationContext context: Context): CheckNetworkStatus {
         return NetworkStatusHelper(context = context)
     }
 }

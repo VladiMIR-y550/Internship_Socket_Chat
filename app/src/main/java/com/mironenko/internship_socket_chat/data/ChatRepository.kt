@@ -1,5 +1,10 @@
 package com.mironenko.internship_socket_chat.data
 
+import kotlinx.coroutines.flow.Flow
+
 interface ChatRepository {
-    suspend fun connectToSocket(): String
+    val isAuthorized: Flow<Boolean>
+    suspend fun connectToServer(): String
+    suspend fun authorization()
+    fun disconnectServer()
 }

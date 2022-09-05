@@ -7,4 +7,6 @@
     <string name="enter_password">Enter password</string>
     <string name="sing_up">Sing up</string>
     <string name="enter_your_message">Enter your message…</string>
+    <string name="lost_internet_connection">Lost internet connection</string>
+    <string name="auth_status">auth_status</string>
 </resources>

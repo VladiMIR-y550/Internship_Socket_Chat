@@ -24,7 +24,22 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.state.observe(viewLifecycleOwner) {
+            binding.tvAuthStatus.text = it.authStatus
             binding.tvInput.text = it.message
+            if (!it.isInternetAvailable) {
+                binding.tvInternetConnection.visibility = View.VISIBLE
+            } else {
+                binding.tvInternetConnection.visibility = View.GONE
+            }
+            if (it.isProgress) {
+                binding.pbAuthProgress.visibility = View.VISIBLE
+            } else {
+                binding.pbAuthProgress.visibility = View.INVISIBLE
+            }
+        }
+
+        binding.btnSingIn.setOnClickListener {
+            viewModel.authorization()
         }
     }
 }
