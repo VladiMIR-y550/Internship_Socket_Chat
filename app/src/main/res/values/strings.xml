@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Internship_Socket_Chat</string>
+    <string name="user_name">user_name</string>
+    <string name="enter_login">Enter login</string>
+    <string name="sing_in">sing in</string>
+    <string name="input">Input</string>
+    <string name="enter_password">Enter password</string>
+    <string name="sing_up">Sing up</string>
+    <string name="enter_your_message">Enter your message…</string>
+    <string name="lost_internet_connection">Lost internet connection</string>
+    <string name="auth_status">auth_status</string>
 </resources>
