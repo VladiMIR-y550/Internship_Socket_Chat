@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.net.*
 import javax.inject.Inject
 
@@ -29,7 +28,7 @@ class ChatSocketClient @Inject constructor(
             val packetSend = DatagramPacket(
                 buffer,
                 buffer.size,
-                InetAddress.getByName("255.255.255.255"),
+                InetAddress.getByName("192.168.31.100"),
                 8888
             )
             val packetReceive = DatagramPacket(buffer, buffer.size)
