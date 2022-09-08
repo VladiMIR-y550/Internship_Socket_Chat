@@ -25,28 +25,10 @@ class AuthStatusInteractor @Inject constructor(
         state: UserAuthorizationState,
         action: UserAuthorizationAction
     ): UserAuthorizationAction {
-        return when (action) {
-            UserAuthorizationAction.ConnectToServer -> {
-                try {
-                    UserAuthorizationAction.ServerStatus(chatRepository.connectToServer())
-                } catch (e: Exception) {
-                    UserAuthorizationAction.Error(e)
-                }
-            }
-            UserAuthorizationAction.UnAuthorized -> {
-                UserAuthorizationAction.SingIn
-            }
-            else -> UserAuthorizationAction.Error(
-                IllegalArgumentException("Wrong Action $action")
-            )
-        }
+        throw IllegalArgumentException("Wrong Action $action")
     }
 
     override fun canHandle(action: UserAuthorizationAction): Boolean {
-        return when (action) {
-            is UserAuthorizationAction.ConnectToServer -> true
-            is UserAuthorizationAction.UnAuthorized -> true
-            else -> false
-        }
+        return false
     }
 }

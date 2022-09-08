@@ -10,7 +10,8 @@ class UsersChatRepository @Inject constructor(
 
     override val isAuthorized: Flow<Boolean> = chatSocket.isAuthorized
 
-    override suspend fun connectToServer(): String {
-        return chatSocket.connectToServerUdp()
+    override suspend fun userLogIn(login: String): String {
+        chatSocket.connectToServerUdp()
+        return chatSocket.connectToServerTcp(login = login)
     }
 }

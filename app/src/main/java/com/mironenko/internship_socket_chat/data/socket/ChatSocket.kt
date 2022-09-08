@@ -4,5 +4,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatSocket {
     val isAuthorized: Flow<Boolean>
-    suspend fun connectToServerUdp(): String
+    suspend fun connectToServerUdp()
+    suspend fun connectToServerTcp(login: String): String
 }
