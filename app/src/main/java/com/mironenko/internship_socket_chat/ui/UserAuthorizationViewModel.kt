@@ -13,11 +13,11 @@ class UserAuthorizationViewModel @Inject constructor(
     reducer = UserAuthorizationReducer()
 ) {
 
-    init {
-        action(UserAuthorizationAction.ConnectToServer)
+    fun singIn() {
+        action(UserAuthorizationAction.SingIn)
     }
 
-    fun singIn(login: String) {
-        action(UserAuthorizationAction.SingIn(login))
+    fun setLogin(login: String) {
+        action(UserAuthorizationAction.SetLogin(login))
     }
 }

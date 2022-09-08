@@ -17,8 +17,11 @@ const val SOCKET_TIMEOUT = 10000
 
 class ChatSocketClient @Inject constructor(
 ) : ChatSocket {
+    private val gsonObj = Gson()
+    private var socketTCP: Socket? = null
+    private var writer: PrintWriter? = null
+    private var reader: BufferedReader? = null
     private var socketAddress: SocketAddress? = null
-    private val socketUdp = DatagramSocket()
 
     private val _isAuthorized = MutableStateFlow(false)
     override val isAuthorized: Flow<Boolean> = _isAuthorized.asStateFlow()
@@ -27,9 +30,10 @@ class ChatSocketClient @Inject constructor(
     private var userId: String = ""
 
 
-    override suspend fun connectToServerUdp(): String {
+    override suspend fun connectToServerUdp() {
         var isSocketAddress = false
         withContext(Dispatchers.IO) {
+            val socketUdp = DatagramSocket()
             socketUdp.broadcast = true
             socketUdp.soTimeout = SOCKET_TIMEOUT
             val buffer = ByteArray(256)
@@ -51,27 +55,27 @@ class ChatSocketClient @Inject constructor(
                     serverIp = splitSocketAddress(socketAddress.toString())
                 } catch (e: SocketTimeoutException) {
                     e.printStackTrace()
+                    socketUdp.close()
                     break
                 }
             }
             _isAuthorized.value = isSocketAddress
         }
-        return serverIp
     }
 
     override suspend fun connectToServerTcp(login: String): String {
         var isUserId = false
         withContext(Dispatchers.IO) {
-            val socketTCP = Socket(serverIp, 6666)
-            socketTCP.soTimeout = SOCKET_TIMEOUT
-            val writer = PrintWriter(OutputStreamWriter(socketTCP.getOutputStream()))
-            val reader = BufferedReader(InputStreamReader(socketTCP.getInputStream()))
-            while (socketTCP.isConnected && !isUserId) {
+            socketTCP = Socket(serverIp, 6666)
+            socketTCP!!.soTimeout = SOCKET_TIMEOUT
+            writer = PrintWriter(OutputStreamWriter(socketTCP!!.getOutputStream()))
+            reader = BufferedReader(InputStreamReader(socketTCP!!.getInputStream()))
+            while (socketTCP!!.isConnected && !isUserId) {
                 try {
-                    val response = reader.readLine()
+                    val response = reader!!.readLine()
                     userId = getIdFromServer(response = response)
-                    writer.println(sendOnServer(userId, login))
-                    writer.flush()
+                    writer!!.println(sendOnServer(userId, login))
+                    writer!!.flush()
                     isUserId = userId.isNotBlank()
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -83,7 +87,6 @@ class ChatSocketClient @Inject constructor(
     }
 
     private fun getIdFromServer(response: String): String {
-        val gsonObj = Gson()
         var connectedIdDto = ""
         val baseDtoObj = gsonObj.fromJson(response, BaseDto::class.java)
         if (baseDtoObj.action == BaseDto.Action.CONNECTED) {
@@ -93,7 +96,6 @@ class ChatSocketClient @Inject constructor(
     }
 
     private fun sendOnServer(id: String, login: String): String {
-        val gsonObj = Gson()
         val action = BaseDto.Action.CONNECT
         val payload = gsonObj.toJson(
             ConnectDto(
