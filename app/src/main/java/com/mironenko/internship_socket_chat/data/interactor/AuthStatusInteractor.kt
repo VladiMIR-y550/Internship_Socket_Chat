@@ -34,7 +34,9 @@ class AuthStatusInteractor @Inject constructor(
                 }
             }
             UserAuthorizationAction.UnAuthorized -> {
-                UserAuthorizationAction.SingIn
+                UserAuthorizationAction.Error(
+                    IllegalArgumentException("Authorization is Fall")
+                )
             }
             else -> UserAuthorizationAction.Error(
                 IllegalArgumentException("Wrong Action $action")

@@ -30,5 +30,12 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
             binding.tvInternetConnection.isVisible = it.isInternetAvailable
             binding.pbAuthProgress.isVisible = it.isProgress
         }
+
+        binding.btnSingIn.setOnClickListener {
+            val login = binding.etLoginInput.text.toString()
+            if (login.isNotBlank()) {
+                viewModel.singIn(login)
+            }
+        }
     }
 }

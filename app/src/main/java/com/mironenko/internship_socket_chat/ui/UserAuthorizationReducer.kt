@@ -1,6 +1,7 @@
 package com.mironenko.internship_socket_chat.ui
 
 import com.mironenko.internship_socket_chat.base.Reducer
+import com.mironenko.internship_socket_chat.data.socket.model.User
 import javax.inject.Inject
 
 class UserAuthorizationReducer @Inject constructor() :
@@ -13,7 +14,15 @@ class UserAuthorizationReducer @Inject constructor() :
         action: UserAuthorizationAction
     ): UserAuthorizationState {
         return when (action) {
-            UserAuthorizationAction.SingIn -> state
+
+            is UserAuthorizationAction.SingIn -> state.copy(
+                isProgress = true
+            )
+
+            is UserAuthorizationAction.LoggedIn -> state.copy(
+                isProgress = false,
+                message = "User Id = ${action.userId}"
+            )
 
             //Side effect
             UserAuthorizationAction.None -> state

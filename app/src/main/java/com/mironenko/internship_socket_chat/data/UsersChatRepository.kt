@@ -13,4 +13,8 @@ class UsersChatRepository @Inject constructor(
     override suspend fun connectToServer(): String {
         return chatSocket.connectToServerUdp()
     }
+
+    override suspend fun userLogIn(login: String): String {
+        return chatSocket.connectToServerTcp(login = login)
+    }
 }

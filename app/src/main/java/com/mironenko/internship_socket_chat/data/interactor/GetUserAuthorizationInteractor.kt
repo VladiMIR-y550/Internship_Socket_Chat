@@ -15,8 +15,8 @@ class GetUserAuthorizationInteractor @Inject constructor(
         action: UserAuthorizationAction
     ): UserAuthorizationAction {
         return when (action) {
-            UserAuthorizationAction.SingIn -> {
-                UserAuthorizationAction.None
+            is UserAuthorizationAction.SingIn -> {
+                UserAuthorizationAction.LoggedIn(repository.userLogIn(action.userLogin))
             }
             else -> UserAuthorizationAction.Error(IllegalArgumentException("Wrong action $action"))
         }

@@ -1,7 +1,6 @@
 package com.mironenko.internship_socket_chat.base
 
 import kotlinx.coroutines.flow.Flow
-import java.lang.Exception
 
 interface Interactor<State, Action> {
 
@@ -10,6 +9,6 @@ interface Interactor<State, Action> {
     fun canHandle(action: Action): Boolean
 }
 
-interface SideEffectInteractor<State, Action>: Interactor<State, Action> {
+interface SideEffectInteractor<State, Action> : Interactor<State, Action> {
     val sideEffectFlow: Flow<Action>
 }
