@@ -2,10 +2,12 @@ package com.mironenko.internship_socket_chat.data.socket
 
 import com.google.gson.Gson
 import com.mironenko.internship_socket_chat.data.socket.model.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.*
@@ -16,6 +18,7 @@ const val SOCKET_TIMEOUT = 10000
 class ChatSocketClient @Inject constructor(
 ) : ChatSocket {
     private val gsonObj = Gson()
+    private val clientScope = CoroutineScope(Dispatchers.IO)
     private var socketTCP: Socket? = null
     private var writer: PrintWriter? = null
     private var reader: BufferedReader? = null
@@ -62,57 +65,49 @@ class ChatSocketClient @Inject constructor(
     }
 
     override suspend fun connectToServerTcp(login: String): String {
-        withContext(Dispatchers.IO) {
-            socketTCP = Socket(serverIp, 6666)
-            socketTCP!!.soTimeout = SOCKET_TIMEOUT
-            writer = PrintWriter(OutputStreamWriter(socketTCP!!.getOutputStream()))
-            reader = BufferedReader(InputStreamReader(socketTCP!!.getInputStream()))
-            while (socketTCP!!.isConnected) {
+        socketTCP = Socket(serverIp, 6666)
+        socketTCP?.soTimeout = SOCKET_TIMEOUT
+        writer = PrintWriter(OutputStreamWriter(socketTCP?.getOutputStream()))
+        reader = BufferedReader(InputStreamReader(socketTCP?.getInputStream()))
+
+        clientScope.launch {
+            while (socketTCP?.isConnected == true) {
                 try {
-                    withContext(Dispatchers.IO) {
-                        while (socketTCP!!.isConnected) {
-                            try {
-                                val baseDto = jsonToBaseDto(reader!!.readLine())
-                                when (baseDto.action) {
-                                    BaseDto.Action.CONNECTED -> {
-                                        val connectedDto = getConnectedDto(baseDto)
-                                        userId = connectedDto.id
-                                        sendJson(
-                                            jsonBaseDto(
-                                                baseDtoAction = BaseDto.Action.CONNECT,
-                                                id = userId,
-                                                login = login
-                                            )
-                                        )
-                                        sendJson(
-                                            jsonBaseDto(
-                                                baseDtoAction = BaseDto.Action.PING,
-                                                id = userId
-                                            )
-                                        )
-                                    }
-                                    BaseDto.Action.PONG -> {
-                                        val pongId = getPongDto(baseDto).id
-                                        sendJson(
-                                            jsonBaseDto(
-                                                baseDtoAction = BaseDto.Action.PING,
-                                                id = pongId
-                                            )
-                                        )
-                                    }
-                                    else -> {
-                                        throw IllegalArgumentException("Wrong BaseDto.Action")
-                                    }
-                                }
-                            } catch (e: IOException) {
-                                e.printStackTrace()
-                                break
-                            }
+                    val baseDto = jsonToBaseDto(reader?.readLine().toString())
+
+                    when (baseDto.action) {
+                        BaseDto.Action.CONNECTED -> {
+                            val connectedDto = getConnectedDto(baseDto)
+                            userId = connectedDto.id
+                            sendJson(
+                                jsonBaseDto(
+                                    baseDtoAction = BaseDto.Action.CONNECT,
+                                    id = userId,
+                                    login = login
+                                )
+                            )
+                            sendJson(
+                                jsonBaseDto(
+                                    baseDtoAction = BaseDto.Action.PING,
+                                    id = userId
+                                )
+                            )
+                        }
+                        BaseDto.Action.PONG -> {
+                            val pongId = getPongDto(baseDto).id
+                            sendJson(
+                                jsonBaseDto(
+                                    baseDtoAction = BaseDto.Action.PING,
+                                    id = pongId
+                                )
+                            )
+                        }
+                        else -> {
+                            throw IllegalArgumentException("Wrong BaseDto.Action")
                         }
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
-                    break
                 }
             }
         }
@@ -120,8 +115,8 @@ class ChatSocketClient @Inject constructor(
     }
 
     private fun sendJson(baseDtoJson: String) {
-        writer!!.println(baseDtoJson)
-        writer!!.flush()
+        writer?.println(baseDtoJson)
+        writer?.flush()
     }
 
     private fun jsonBaseDto(baseDtoAction: BaseDto.Action, id: String, login: String = ""): String {
