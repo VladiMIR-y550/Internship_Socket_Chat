@@ -8,5 +8,5 @@ interface ChatSocket {
     val users: Flow<List<User>>
     suspend fun connectToServerUdp()
     suspend fun connectToServerTcp(login: String)
-    suspend fun sendGetUsers()
+    suspend fun updateUsersCycle()
 }
