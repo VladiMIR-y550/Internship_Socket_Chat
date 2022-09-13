@@ -1,4 +1,4 @@
-package com.mironenko.internship_socket_chat.ui
+package com.mironenko.internship_socket_chat.ui.auth
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import com.mironenko.internship_socket_chat.R
 import com.mironenko.internship_socket_chat.base.BaseFragment
 import com.mironenko.internship_socket_chat.databinding.FragmentUserAuthorizationBinding
+import com.mironenko.internship_socket_chat.ui.user_list.UserListFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,6 +32,9 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
             binding.tvInput.text = it.message
             binding.tvInternetConnection.isVisible = it.isInternetAvailable
             binding.pbAuthProgress.isVisible = it.isProgress
+            if (it.isAuth) {
+                navigationToUserListScreen()
+            }
         }
         binding.etLoginInput.addTextChangedListener {
             viewModel.setLogin(it.toString())
@@ -38,5 +43,12 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
         binding.btnSingIn.setOnClickListener {
             viewModel.singIn()
         }
+    }
+
+    private fun navigationToUserListScreen() {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, UserListFragment())
+            .addToBackStack(null)
+            .commit()
     }
 }

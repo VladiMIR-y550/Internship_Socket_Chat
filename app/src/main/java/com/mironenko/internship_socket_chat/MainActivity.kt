@@ -3,7 +3,7 @@ package com.mironenko.internship_socket_chat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.mironenko.internship_socket_chat.databinding.ActivityMainBinding
-import com.mironenko.internship_socket_chat.ui.UserAuthorizationFragment
+import com.mironenko.internship_socket_chat.ui.auth.UserAuthorizationFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

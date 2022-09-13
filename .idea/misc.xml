@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProjects/Internship/Internship_Socket_Chat/app/src/main/res/layout/fragment_user_authorization.xml" value="0.2222222222222222" />
+        <entry key="..\:/AndroidProjects/Internship/Internship_Socket_Chat/app/src/main/res/layout/fragment_user_list.xml" value="0.2222222222222222" />
+        <entry key="..\:/AndroidProjects/Internship/Internship_Socket_Chat/app/src/main/res/layout/layout_user_item.xml" value="0.2512820512820513" />
         <entry key="..\:/Java/Internship/Internship_Socket_Chat/app/src/main/res/drawable/ic_send_btn.xml" value="0.1815" />
         <entry key="..\:/Java/Internship/Internship_Socket_Chat/app/src/main/res/layout/activity_main.xml" value="0.5541666666666667" />
         <entry key="..\:/Java/Internship/Internship_Socket_Chat/app/src/main/res/layout/fragment_user_authorization.xml" value="0.4547008547008547" />

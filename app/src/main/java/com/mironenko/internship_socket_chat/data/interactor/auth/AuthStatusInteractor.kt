@@ -1,9 +1,9 @@
-package com.mironenko.internship_socket_chat.data.interactor
+package com.mironenko.internship_socket_chat.data.interactor.auth
 
 import com.mironenko.internship_socket_chat.base.SideEffectInteractor
 import com.mironenko.internship_socket_chat.data.ChatRepository
-import com.mironenko.internship_socket_chat.ui.UserAuthorizationAction
-import com.mironenko.internship_socket_chat.ui.UserAuthorizationState
+import com.mironenko.internship_socket_chat.ui.auth.UserAuthorizationAction
+import com.mironenko.internship_socket_chat.ui.auth.UserAuthorizationState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

@@ -1,11 +1,10 @@
 package com.mironenko.internship_socket_chat.data.socket
 
+import android.util.Log
 import com.google.gson.Gson
 import com.mironenko.internship_socket_chat.data.socket.model.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import java.io.*
 import java.net.*
 import javax.inject.Inject
@@ -28,6 +27,9 @@ class ChatSocketClient @Inject constructor(
 
     private val _isAuthorized = MutableStateFlow(false)
     override val isAuthorized: Flow<Boolean> = _isAuthorized.asStateFlow()
+
+    private val _users = MutableSharedFlow<List<User>>()
+    override val users: Flow<List<User>> = _users.asSharedFlow()
 
     private var serverIp: String = ""
     private var userId: String = ""
@@ -58,15 +60,12 @@ class ChatSocketClient @Inject constructor(
                     serverIp = splitSocketAddress(socketAddress.toString())
                 } catch (e: SocketTimeoutException) {
                     e.printStackTrace()
-                    socketUdp.close()
-                    break
                 }
             }
-            authorizationStatus(isSocketAddress)
         }
     }
 
-    override suspend fun connectToServerTcp(login: String): String {
+    override suspend fun connectToServerTcp(login: String) {
         userLogin = login
         socketTCP = Socket(serverIp, 6666)
         socketTCP?.soTimeout = SOCKET_TIMEOUT
@@ -82,10 +81,15 @@ class ChatSocketClient @Inject constructor(
                         BaseDto.Action.CONNECTED -> {
                             saveIdFromConnectedDto(baseDto = baseDto)
                             sendConnectDto()
+                            authorizationStatus(true)
                             pingPongCycle()
                         }
                         BaseDto.Action.PONG -> {
                             cancelDisconnectJob()
+                        }
+                        BaseDto.Action.USERS_RECEIVED -> {
+                            sharedUsers(baseDto = baseDto)
+                            Log.d("TAG", baseDto.payload)
                         }
                         else -> {
                             throw IllegalArgumentException("Wrong BaseDto.Action")
@@ -96,7 +100,22 @@ class ChatSocketClient @Inject constructor(
                 }
             }
         }
-        return userId
+    }
+
+    override suspend fun sendGetUsers() {
+        sendJson(
+            jsonFromBaseDto(
+                action = BaseDto.Action.GET_USERS,
+                GetUsersDto(
+                    id = userId
+                )
+            )
+        )
+    }
+
+    private suspend fun sharedUsers(baseDto: BaseDto) {
+        val userList = gsonObj.fromJson(baseDto.payload, UsersReceivedDto::class.java)
+        _users.emit(userList.users)
     }
 
     private fun saveIdFromConnectedDto(baseDto: BaseDto) {

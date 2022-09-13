@@ -1,9 +1,9 @@
-package com.mironenko.internship_socket_chat.data.interactor
+package com.mironenko.internship_socket_chat.data.interactor.auth
 
 import com.mironenko.internship_socket_chat.base.Interactor
 import com.mironenko.internship_socket_chat.data.ChatRepository
-import com.mironenko.internship_socket_chat.ui.UserAuthorizationAction
-import com.mironenko.internship_socket_chat.ui.UserAuthorizationState
+import com.mironenko.internship_socket_chat.ui.auth.UserAuthorizationAction
+import com.mironenko.internship_socket_chat.ui.auth.UserAuthorizationState
 import javax.inject.Inject
 
 class GetUserAuthorizationInteractor @Inject constructor(
@@ -16,7 +16,8 @@ class GetUserAuthorizationInteractor @Inject constructor(
     ): UserAuthorizationAction {
         return when (action) {
             is UserAuthorizationAction.SingIn -> {
-                UserAuthorizationAction.LoggedIn(repository.userLogIn(state.login))
+                repository.userLogIn(state.login)
+                UserAuthorizationAction.LoggedIn
             }
             else -> UserAuthorizationAction.Error(IllegalArgumentException("Wrong action $action"))
         }
