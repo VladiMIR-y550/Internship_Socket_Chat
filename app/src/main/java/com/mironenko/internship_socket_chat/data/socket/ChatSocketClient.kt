@@ -11,8 +11,8 @@ import java.net.*
 import javax.inject.Inject
 
 const val SOCKET_TIMEOUT = 10000
-const val PING_TIMEOUT = 9000L
-const val DISCONNECT_TIMEOUT = 8000L
+const val PING_TIMEOUT = 8000L
+const val DISCONNECT_TIMEOUT = 10000L
 
 class ChatSocketClient @Inject constructor(
 ) : ChatSocket {
