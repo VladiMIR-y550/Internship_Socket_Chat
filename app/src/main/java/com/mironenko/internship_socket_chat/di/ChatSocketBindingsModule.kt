@@ -15,4 +15,8 @@ interface ChatSocketBindingsModule {
     @Singleton
     @Binds
     fun bindUserChatSocket(chatSocketClient: ChatSocketClient): ChatSocket
+
+//    @Singleton
+//    @Binds
+//    fun bindUserTestChatSocket(testChatSocket: TestSocketClient): ChatSocket
 }
