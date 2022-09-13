@@ -11,7 +11,8 @@ import java.net.*
 import javax.inject.Inject
 
 const val SOCKET_TIMEOUT = 10000
-const val PING_TIMEOUT = 8000L
+const val PING_TIMEOUT = 9000L
+const val DISCONNECT_TIMEOUT = 8000L
 
 class ChatSocketClient @Inject constructor(
 ) : ChatSocket {
@@ -23,12 +24,14 @@ class ChatSocketClient @Inject constructor(
     private var writer: PrintWriter? = null
     private var reader: BufferedReader? = null
     private var socketAddress: SocketAddress? = null
+    private var isConnectedTcp = false
 
     private val _isAuthorized = MutableStateFlow(false)
     override val isAuthorized: Flow<Boolean> = _isAuthorized.asStateFlow()
 
     private var serverIp: String = ""
     private var userId: String = ""
+    private var userLogin: String = ""
 
     override suspend fun connectToServerUdp() {
         var isSocketAddress = false
@@ -59,24 +62,26 @@ class ChatSocketClient @Inject constructor(
                     break
                 }
             }
-            _isAuthorized.value = isSocketAddress
+            authorizationStatus(isSocketAddress)
         }
     }
 
     override suspend fun connectToServerTcp(login: String): String {
+        userLogin = login
         socketTCP = Socket(serverIp, 6666)
-        socketTCP?.soTimeout = SOCKET_TIMEOUT
         writer = PrintWriter(OutputStreamWriter(socketTCP?.getOutputStream()))
         reader = BufferedReader(InputStreamReader(socketTCP?.getInputStream()))
-
+        isConnectedTcp = true
         clientScope.launch {
-            while (socketTCP?.isConnected == true) {
+            while (isConnectedTcp) {
                 try {
                     val response = reader?.readLine() ?: continue
                     val baseDto = gsonObj.fromJson(response, BaseDto::class.java)
                     when (baseDto.action) {
                         BaseDto.Action.CONNECTED -> {
-                            pingPongCycle(baseDto, login)
+                            saveIdFromConnectedDto(baseDto = baseDto)
+                            sendConnectDto()
+                            pingPongCycle()
                         }
                         BaseDto.Action.PONG -> {
                             cancelDisconnectJob()
@@ -93,37 +98,65 @@ class ChatSocketClient @Inject constructor(
         return userId
     }
 
-    private fun sendPing(): Job {
-        return clientScope.launch {
-            delay(10000)
-            _isAuthorized.value = false
-            clientScope.coroutineContext.cancelChildren()
-            socketTCP?.close()
-            socketTCP = null
+    private fun saveIdFromConnectedDto(baseDto: BaseDto) {
+        val connectedDto = gsonObj.fromJson(baseDto.payload, ConnectedDto::class.java)
+        userId = connectedDto.id
+    }
+
+    private fun sendConnectDto() {
+        sendJson(
+            jsonFromBaseDto(
+                action = BaseDto.Action.CONNECT,
+                ConnectDto(
+                    id = userId,
+                    name = userLogin
+                )
+            )
+        )
+    }
+
+    private fun pingPongCycle() {
+        clientScope.launch {
+            while (isConnectedTcp) {
+                delay(PING_TIMEOUT)
+                sendJson(
+                    jsonFromBaseDto(
+                        action = BaseDto.Action.PING,
+                        PingDto(
+                            id = userId
+                        )
+                    )
+                )
+                disconnectJob = createDisconnectJob()
+            }
         }
     }
 
-    private fun pingPongCycle(baseDto: BaseDto, login: String): Job {
-        val connectedDto = gsonObj.fromJson(baseDto.payload, ConnectedDto::class.java)
-        userId = connectedDto.id
-        sendJson(
-            jsonBaseDto(
-                baseDtoAction = BaseDto.Action.CONNECT,
-                id = userId,
-                login = login
-            )
-        )
+    private fun sendJson(baseDtoJson: String) {
+        writer?.println(baseDtoJson)
+        writer?.flush()
+    }
+
+    private fun jsonFromBaseDto(action: BaseDto.Action, payloadObj: Payload): String {
+        val payload = gsonObj.toJson(payloadObj)
+        val baseDto = BaseDto(action = action, payload = payload)
+        return gsonObj.toJson(baseDto)
+    }
+
+    private fun splitSocketAddress(socketAddress: String): String {
+        return socketAddress.substringAfter("/").substringBefore(":")
+    }
+
+    private fun authorizationStatus(status: Boolean) {
+        _isAuthorized.value = status
+    }
+
+    private fun createDisconnectJob(): Job {
         return clientScope.launch {
-            while (socketTCP?.isConnected == true) {
-                delay(PING_TIMEOUT)
-                sendJson(
-                    jsonBaseDto(
-                        baseDtoAction = BaseDto.Action.PING,
-                        id = userId
-                    )
-                )
-                disconnectJob = sendPing()
-            }
+            delay(DISCONNECT_TIMEOUT)
+            authorizationStatus(false)
+            clientScope.coroutineContext.cancelChildren()
+            socketClose()
         }
     }
 
@@ -132,34 +165,9 @@ class ChatSocketClient @Inject constructor(
         disconnectJob = null
     }
 
-    private fun sendJson(baseDtoJson: String) {
-        writer?.println(baseDtoJson)
-        writer?.flush()
-    }
-
-    private fun jsonBaseDto(
-        baseDtoAction: BaseDto.Action,
-        id: String,
-        login: String = ""
-    ): String {
-        return when (baseDtoAction) {
-            BaseDto.Action.CONNECT -> {
-                val payload = gsonObj.toJson(ConnectDto(id = id, name = login))
-                val baseDto = BaseDto(baseDtoAction, payload)
-                gsonObj.toJson(baseDto)
-            }
-            BaseDto.Action.PING -> {
-                val payload = gsonObj.toJson(PingDto(id = id))
-                val baseDto = BaseDto(baseDtoAction, payload)
-                gsonObj.toJson(baseDto)
-            }
-            else -> {
-                throw IllegalArgumentException("Wrong BaseDto.Action")
-            }
-        }
-    }
-
-    private fun splitSocketAddress(socketAddress: String): String {
-        return socketAddress.substringAfter("/").substringBefore(":")
+    private fun socketClose() {
+        isConnectedTcp = false
+        socketTCP?.close()
+        socketTCP = null
     }
 }
