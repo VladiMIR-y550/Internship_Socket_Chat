@@ -1,4 +1,4 @@
-package com.mironenko.internship_socket_chat.ui
+package com.mironenko.internship_socket_chat.ui.auth
 
 import com.mironenko.internship_socket_chat.base.BaseViewModel
 import com.mironenko.internship_socket_chat.base.Interactor

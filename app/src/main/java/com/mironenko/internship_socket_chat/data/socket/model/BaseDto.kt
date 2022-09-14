@@ -1,7 +1,6 @@
 package com.mironenko.internship_socket_chat.data.socket.model
 
 import com.google.gson.annotations.SerializedName
-import com.mironenko.internship_socket_chat.data.User
 
 data class BaseDto(val action: Action, val payload: String) {
 
@@ -13,7 +12,7 @@ data class BaseDto(val action: Action, val payload: String) {
 data class ConnectDto(
     @SerializedName("id")
     val id: String,
-    @SerializedName("age")
+    @SerializedName("name")
     val name: String
 ) : Payload
 
