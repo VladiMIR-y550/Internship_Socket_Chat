@@ -1,11 +1,11 @@
 package com.mironenko.internship_socket_chat.ui.user_list
 
-import androidx.lifecycle.viewModelScope
 import com.mironenko.internship_socket_chat.base.BaseViewModel
 import com.mironenko.internship_socket_chat.base.Interactor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,11 +15,10 @@ class UserListViewModel @Inject constructor(
     interactors = interactors,
     reducer = UserListReducer()
 ) {
-    private var isUpdateUsers = true
 
-    init {
-        viewModelScope.launch {
-            while (isUpdateUsers) {
+    suspend fun getUsers() {
+        withContext(Dispatchers.Main) {
+            while (true) {
                 action(UserListAction.LoadUsers)
                 delay(1000)
             }

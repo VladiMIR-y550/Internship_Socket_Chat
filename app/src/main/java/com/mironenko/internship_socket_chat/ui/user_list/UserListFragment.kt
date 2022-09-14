@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mironenko.internship_socket_chat.base.BaseFragment
 import com.mironenko.internship_socket_chat.databinding.FragmentUserListBinding
@@ -32,6 +33,10 @@ class UserListFragment : BaseFragment<FragmentUserListBinding>() {
         viewModel.state.observe(viewLifecycleOwner) {
             binding.pbAuthProgress.isVisible = it.isLoading
             userAdapter.submitList(it.userList)
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.getUsers()
         }
     }
 }
