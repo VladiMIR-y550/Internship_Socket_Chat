@@ -18,6 +18,6 @@ class UsersChatRepository @Inject constructor(
     }
 
     override suspend fun downloadUsers() {
-        chatSocket.updateUsersCycle()
+        chatSocket.sendGetUsers()
     }
 }

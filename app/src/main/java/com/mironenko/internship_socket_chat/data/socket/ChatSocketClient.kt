@@ -1,6 +1,5 @@
 package com.mironenko.internship_socket_chat.data.socket
 
-import android.util.Log
 import com.google.gson.Gson
 import com.mironenko.internship_socket_chat.data.socket.model.*
 import kotlinx.coroutines.*
@@ -12,13 +11,11 @@ import javax.inject.Inject
 const val SOCKET_TIMEOUT = 10000
 const val PING_TIMEOUT = 9000L
 const val DISCONNECT_TIMEOUT = 8000L
-const val UPDATE_USERS_TIMEOUT = 1000L
 
 class ChatSocketClient @Inject constructor(
 ) : ChatSocket {
     private val gsonObj = Gson()
     private val clientScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    private val usersScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var disconnectJob: Job? = null
     private var socketTCP: Socket? = null
     private var writer: PrintWriter? = null
@@ -90,7 +87,6 @@ class ChatSocketClient @Inject constructor(
                         }
                         BaseDto.Action.USERS_RECEIVED -> {
                             sharedUsers(baseDto = baseDto)
-                            Log.d("TAG", baseDto.payload)
                         }
                         else -> {
                             throw IllegalArgumentException("Wrong BaseDto.Action")
@@ -103,20 +99,16 @@ class ChatSocketClient @Inject constructor(
         }
     }
 
-    override suspend fun updateUsersCycle() {
-        usersScope.launch {
-            while (isConnectedTcp) {
-                Log.d("TAG", "UploadUsers start")
-                sendJson(
-                    jsonFromBaseDto(
-                        action = BaseDto.Action.GET_USERS,
-                        GetUsersDto(
-                            id = userId
-                        )
+    override suspend fun sendGetUsers() {
+        withContext(Dispatchers.IO) {
+            sendJson(
+                jsonFromBaseDto(
+                    action = BaseDto.Action.GET_USERS,
+                    GetUsersDto(
+                        id = userId
                     )
                 )
-                delay(UPDATE_USERS_TIMEOUT)
-            }
+            )
         }
     }
 
@@ -183,7 +175,6 @@ class ChatSocketClient @Inject constructor(
             delay(DISCONNECT_TIMEOUT)
             authorizationStatus(false)
             clientScope.coroutineContext.cancelChildren()
-            usersScope.coroutineContext.cancelChildren()
             socketClose()
         }
     }
