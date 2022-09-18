@@ -14,10 +14,6 @@ class UserChatAdapter(
     private val receiveId: String
 ) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
-    enum class TypeItem(val type: Int) {
-        SEND(1), RECEIVE(2)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -41,7 +37,6 @@ class UserChatAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val message = currentList[position]
-        Log.d("TAG", "getItemViewType $position, list size ${currentList.size}")
         return if (message.id == receiveId) {
             TypeItem.RECEIVE.type
         } else {
@@ -73,5 +68,9 @@ class UserChatAdapter(
         override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
             return oldItem == oldItem
         }
+    }
+
+    enum class TypeItem(val type: Int) {
+        SEND(1), RECEIVE(2)
     }
 }
