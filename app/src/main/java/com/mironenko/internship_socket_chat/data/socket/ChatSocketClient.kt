@@ -1,8 +1,12 @@
 package com.mironenko.internship_socket_chat.data.socket
 
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.google.gson.Gson
 import com.mironenko.internship_socket_chat.data.socket.model.*
+import com.mironenko.internship_socket_chat.util.SAVED_USER_ID
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import java.io.*
 import java.net.*
@@ -13,7 +17,9 @@ const val PING_TIMEOUT = 9000L
 const val DISCONNECT_TIMEOUT = 8000L
 
 class ChatSocketClient @Inject constructor(
+    private val sharedPref: SharedPreferences
 ) : ChatSocket {
+
     private val gsonObj = Gson()
     private val clientScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var disconnectJob: Job? = null
@@ -29,8 +35,11 @@ class ChatSocketClient @Inject constructor(
     private val _users = MutableSharedFlow<List<User>>()
     override val users: Flow<List<User>> = _users.asSharedFlow()
 
+    private val _messages =
+        MutableSharedFlow<MessageDto>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    override val messages: Flow<MessageDto> = _messages.asSharedFlow()
+
     private var serverIp: String = ""
-    private var userId: String = ""
     private var userLogin: String = ""
 
     override suspend fun connectToServerUdp() {
@@ -88,6 +97,9 @@ class ChatSocketClient @Inject constructor(
                         BaseDto.Action.USERS_RECEIVED -> {
                             sharedUsers(baseDto = baseDto)
                         }
+                        BaseDto.Action.NEW_MESSAGE -> {
+                            sharedMessages(baseDto = baseDto)
+                        }
                         else -> {
                             throw IllegalArgumentException("Wrong BaseDto.Action")
                         }
@@ -99,17 +111,33 @@ class ChatSocketClient @Inject constructor(
         }
     }
 
+    override suspend fun sendMessage(sendMessageDto: SendMessageDto) {
+        withContext(Dispatchers.IO) {
+            sendJson(
+                jsonFromBaseDto(
+                    action = BaseDto.Action.SEND_MESSAGE,
+                    sendMessageDto
+                )
+            )
+        }
+    }
+
     override suspend fun sendGetUsers() {
         withContext(Dispatchers.IO) {
             sendJson(
                 jsonFromBaseDto(
                     action = BaseDto.Action.GET_USERS,
                     GetUsersDto(
-                        id = userId
+                        id = getUserIdFromSharedPref()
                     )
                 )
             )
         }
+    }
+
+    private suspend fun sharedMessages(baseDto: BaseDto) {
+        val messages = gsonObj.fromJson(baseDto.payload, MessageDto::class.java)
+        _messages.emit(messages)
     }
 
     private suspend fun sharedUsers(baseDto: BaseDto) {
@@ -119,7 +147,9 @@ class ChatSocketClient @Inject constructor(
 
     private fun saveIdFromConnectedDto(baseDto: BaseDto) {
         val connectedDto = gsonObj.fromJson(baseDto.payload, ConnectedDto::class.java)
-        userId = connectedDto.id
+        sharedPref.edit {
+            putString(SAVED_USER_ID, connectedDto.id)
+        }
     }
 
     private fun sendConnectDto() {
@@ -127,7 +157,7 @@ class ChatSocketClient @Inject constructor(
             jsonFromBaseDto(
                 action = BaseDto.Action.CONNECT,
                 ConnectDto(
-                    id = userId,
+                    id = getUserIdFromSharedPref(),
                     name = userLogin
                 )
             )
@@ -142,7 +172,7 @@ class ChatSocketClient @Inject constructor(
                     jsonFromBaseDto(
                         action = BaseDto.Action.PING,
                         PingDto(
-                            id = userId
+                            id = getUserIdFromSharedPref()
                         )
                     )
                 )
@@ -188,5 +218,9 @@ class ChatSocketClient @Inject constructor(
         isConnectedTcp = false
         socketTCP?.close()
         socketTCP = null
+    }
+
+    private fun getUserIdFromSharedPref(): String {
+        return sharedPref.getString(SAVED_USER_ID, "") ?: ""
     }
 }

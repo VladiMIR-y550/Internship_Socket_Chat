@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mironenko.internship_socket_chat.data.socket.model.User
 import com.mironenko.internship_socket_chat.databinding.LayoutUserItemBinding
 
-class UserListAdapter : ListAdapter<User, UserListAdapter.UserViewHolder>(UserDiffCallback()) {
+class UserListAdapter(
+    private val onItemClicked:(User) -> Unit
+) : ListAdapter<User, UserListAdapter.UserViewHolder>(UserDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -25,7 +27,12 @@ class UserListAdapter : ListAdapter<User, UserListAdapter.UserViewHolder>(UserDi
     inner class UserViewHolder(private val binding: LayoutUserItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
-            binding.tvUserName.text = user.name
+            with(binding) {
+                tvUserName.text = user.name
+                root.setOnClickListener{
+                    onItemClicked(user)
+                }
+            }
         }
     }
 
