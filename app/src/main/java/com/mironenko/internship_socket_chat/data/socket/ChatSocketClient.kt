@@ -1,10 +1,7 @@
 package com.mironenko.internship_socket_chat.data.socket
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.google.gson.Gson
 import com.mironenko.internship_socket_chat.data.socket.model.*
-import com.mironenko.internship_socket_chat.util.SAVED_USER_ID
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -16,9 +13,9 @@ const val SOCKET_TIMEOUT = 10000
 const val PING_TIMEOUT = 9000L
 const val DISCONNECT_TIMEOUT = 8000L
 
-class ChatSocketClient @Inject constructor(
-    private val sharedPref: SharedPreferences
-) : ChatSocket {
+class ChatSocketClient @Inject constructor() : ChatSocket {
+
+    override var userId = ""
 
     private val gsonObj = Gson()
     private val clientScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -128,7 +125,7 @@ class ChatSocketClient @Inject constructor(
                 jsonFromBaseDto(
                     action = BaseDto.Action.GET_USERS,
                     GetUsersDto(
-                        id = getUserIdFromSharedPref()
+                        id = userId
                     )
                 )
             )
@@ -147,9 +144,7 @@ class ChatSocketClient @Inject constructor(
 
     private fun saveIdFromConnectedDto(baseDto: BaseDto) {
         val connectedDto = gsonObj.fromJson(baseDto.payload, ConnectedDto::class.java)
-        sharedPref.edit {
-            putString(SAVED_USER_ID, connectedDto.id)
-        }
+        userId = connectedDto.id
     }
 
     private fun sendConnectDto() {
@@ -157,7 +152,7 @@ class ChatSocketClient @Inject constructor(
             jsonFromBaseDto(
                 action = BaseDto.Action.CONNECT,
                 ConnectDto(
-                    id = getUserIdFromSharedPref(),
+                    id = userId,
                     name = userLogin
                 )
             )
@@ -172,7 +167,7 @@ class ChatSocketClient @Inject constructor(
                     jsonFromBaseDto(
                         action = BaseDto.Action.PING,
                         PingDto(
-                            id = getUserIdFromSharedPref()
+                            id = userId
                         )
                     )
                 )
@@ -218,9 +213,5 @@ class ChatSocketClient @Inject constructor(
         isConnectedTcp = false
         socketTCP?.close()
         socketTCP = null
-    }
-
-    private fun getUserIdFromSharedPref(): String {
-        return sharedPref.getString(SAVED_USER_ID, "") ?: ""
     }
 }

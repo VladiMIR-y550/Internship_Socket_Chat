@@ -12,13 +12,14 @@ class UsersChatRepository @Inject constructor(
     private val chatSocket: ChatSocket
 ) : ChatRepository {
 
+    override val userId = chatSocket.userId
     override val isAuthorized: Flow<Boolean> = chatSocket.isAuthorized
     override val users: Flow<List<User>> = chatSocket.users
     override val messages: Flow<ChatMessage>
         get() = chatSocket.messages.map {
             ChatMessage(
-                id = it.from.id,
-                receiver = it.from.name,
+                receiverId = it.from.id,
+                userId = it.from.name,
                 message = it.message
             )
         }
@@ -35,8 +36,8 @@ class UsersChatRepository @Inject constructor(
     override suspend fun sendMessage(messageChat: ChatMessage) {
         chatSocket.sendMessage(
             SendMessageDto(
-                id = messageChat.id,
-                receiver = messageChat.receiver,
+                id = messageChat.receiverId,
+                receiver = messageChat.userId,
                 message = messageChat.message
             )
         )

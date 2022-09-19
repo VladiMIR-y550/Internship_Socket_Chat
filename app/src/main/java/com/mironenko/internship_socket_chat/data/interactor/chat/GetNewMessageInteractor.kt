@@ -19,7 +19,7 @@ class GetNewMessageInteractor @Inject constructor(
 
     override suspend fun invoke(state: UserChatState, action: UserChatAction): UserChatAction {
         return if (action is UserChatAction.NewMessageReceived) {
-            if (action.chatMessage.id == state.receiverId) {
+            if (action.chatMessage.receiverId == state.receiverId) {
                 UserChatAction.ShowReceivedMessage(action.chatMessage)
             } else {
                 UserChatAction.None

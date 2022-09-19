@@ -1,6 +1,5 @@
 package com.mironenko.internship_socket_chat.ui.chat
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -11,16 +10,16 @@ import com.mironenko.internship_socket_chat.databinding.LayoutReceivedMessageIte
 import com.mironenko.internship_socket_chat.databinding.LayoutSendMessageItemBinding
 
 class UserChatAdapter(
-    private val receiveId: String
+    private val isSentMessage: (author: String) -> Boolean
 ) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            TypeItem.SEND.type -> SendMessageViewHolder(
+            TypeItem.SEND.ordinal -> SendMessageViewHolder(
                 LayoutSendMessageItemBinding.inflate(inflater, parent, false)
             )
-            TypeItem.RECEIVE.type -> ReceivedMessageViewHolder(
+            TypeItem.RECEIVE.ordinal -> ReceivedMessageViewHolder(
                 LayoutReceivedMessageItemBinding.inflate(inflater, parent, false)
             )
             else -> throw IllegalArgumentException("Wrong Type View Holder $viewType")
@@ -37,14 +36,14 @@ class UserChatAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val message = currentList[position]
-        return if (message.id == receiveId) {
-            TypeItem.RECEIVE.type
+        return if (isSentMessage(message.receiverId)) {
+            TypeItem.RECEIVE.ordinal
         } else {
-            TypeItem.SEND.type
+            TypeItem.SEND.ordinal
         }
     }
 
-    inner class SendMessageViewHolder(
+    class SendMessageViewHolder(
         private val binding: LayoutSendMessageItemBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(message: ChatMessage) {
@@ -70,7 +69,7 @@ class UserChatAdapter(
         }
     }
 
-    enum class TypeItem(val type: Int) {
-        SEND(1), RECEIVE(2)
+    enum class TypeItem {
+        SEND, RECEIVE
     }
 }

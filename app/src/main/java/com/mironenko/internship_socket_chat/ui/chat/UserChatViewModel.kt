@@ -12,15 +12,18 @@ import javax.inject.Inject
 @HiltViewModel
 class UserChatViewModel @Inject constructor(
     interactors: Set<@JvmSuppressWildcards Interactor<UserChatState, UserChatAction>>,
-    savedStateHandle: SavedStateHandle,
-    sharedPreferences: SharedPreferences
+    private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel<UserChatState, UserChatAction>(
     interactors = interactors,
     reducer = UserChatReducer(
-        sharedPreferences.getString(SAVED_USER_ID, "") ?: "",
         savedStateHandle.get<String>(ARG_RECEIVER_ID)!!
     )
 ) {
+
+    fun isSentMessage(receiveId: String): Boolean {
+        return receiveId == savedStateHandle[ARG_RECEIVER_ID]
+    }
+
 
     fun setMessage(message: String) {
         action(UserChatAction.SetMessage(message))

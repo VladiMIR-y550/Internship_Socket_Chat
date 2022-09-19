@@ -17,13 +17,13 @@ class UserChatFragment : BaseFragment<FragmentUserChatBinding>() {
 
     private val viewModel: UserChatViewModel by viewModels()
     private val chatAdapter: UserChatAdapter by lazy {
-        UserChatAdapter(
-            arguments?.getString(ARG_RECEIVER_ID) ?: ""
-        )
+        UserChatAdapter {
+            return@UserChatAdapter viewModel.isSentMessage(it)
+        }
     }
 
-    override val viewBindingProvider: (LayoutInflater, ViewGroup?) -> FragmentUserChatBinding =
-        { inflater, container ->
+    override val viewBindingProvider: (LayoutInflater, ViewGroup?) -> FragmentUserChatBinding = {
+            inflater, container ->
             FragmentUserChatBinding.inflate(inflater, container, false)
         }
 
@@ -40,7 +40,6 @@ class UserChatFragment : BaseFragment<FragmentUserChatBinding>() {
             viewModel.sendMessage()
             binding.etSendMessage.text.clear()
         }
-
     }
 
     private fun initViews() {
@@ -50,14 +49,11 @@ class UserChatFragment : BaseFragment<FragmentUserChatBinding>() {
         with(binding) {
             recyclerViewChat.adapter = chatAdapter
             recyclerViewChat.layoutManager = layoutManager
-
         }
     }
 
     private fun renderState(newState: UserChatState) {
-        val list = ArrayList(chatAdapter.currentList).toMutableList()
-        newState.showMessage?.let { list.add(it) }
-        chatAdapter.submitList(list)
+        chatAdapter.submitList(newState.messages)
         binding.recyclerViewChat.smoothScrollToPosition(chatAdapter.itemCount)
     }
 

@@ -14,8 +14,8 @@ class SendMessageInteractor @Inject constructor(
         return if (action is UserChatAction.SendMessage) {
             val message = state.sendMessage
             val messageSend = ChatMessage(
-                id = state.userId,
-                receiver = state.receiverId,
+                userId = state.receiverId,
+                receiverId = chatRepository.userId,
                 message = message
             )
             chatRepository.sendMessage(
