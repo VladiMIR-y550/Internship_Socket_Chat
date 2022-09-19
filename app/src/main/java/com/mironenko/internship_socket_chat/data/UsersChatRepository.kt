@@ -12,7 +12,8 @@ class UsersChatRepository @Inject constructor(
     private val chatSocket: ChatSocket
 ) : ChatRepository {
 
-    override val userId = chatSocket.userId
+    override val userId: String
+        get() = chatSocket.getUserId()
     override val isAuthorized: Flow<Boolean> = chatSocket.isAuthorized
     override val users: Flow<List<User>> = chatSocket.users
     override val messages: Flow<ChatMessage>

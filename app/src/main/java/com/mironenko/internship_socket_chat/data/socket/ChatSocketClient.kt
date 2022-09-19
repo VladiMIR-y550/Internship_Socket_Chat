@@ -15,8 +15,6 @@ const val DISCONNECT_TIMEOUT = 8000L
 
 class ChatSocketClient @Inject constructor() : ChatSocket {
 
-    override var userId = ""
-
     private val gsonObj = Gson()
     private val clientScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var disconnectJob: Job? = null
@@ -38,6 +36,11 @@ class ChatSocketClient @Inject constructor() : ChatSocket {
 
     private var serverIp: String = ""
     private var userLogin: String = ""
+    private var userId = ""
+
+    override fun getUserId(): String {
+        return userId
+    }
 
     override suspend fun connectToServerUdp() {
         var isSocketAddress = false
