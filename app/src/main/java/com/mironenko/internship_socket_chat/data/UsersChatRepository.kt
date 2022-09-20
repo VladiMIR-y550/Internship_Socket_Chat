@@ -1,5 +1,6 @@
 package com.mironenko.internship_socket_chat.data
 
+import com.mironenko.internship_socket_chat.data.interactor.local.LocalDataSource
 import com.mironenko.internship_socket_chat.data.socket.ChatSocket
 import com.mironenko.internship_socket_chat.data.socket.model.ChatMessage
 import com.mironenko.internship_socket_chat.data.socket.model.SendMessageDto
@@ -9,13 +10,18 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UsersChatRepository @Inject constructor(
-    private val chatSocket: ChatSocket
+    private val chatSocket: ChatSocket,
+    private val localStorage: LocalDataSource
 ) : ChatRepository {
 
-    override val userId: String
-        get() = chatSocket.getUserId()
     override val isAuthorized: Flow<Boolean> = chatSocket.isAuthorized
     override val users: Flow<List<User>> = chatSocket.users
+    override val userId: String
+        get() = chatSocket.getUserId()
+
+    override val loginSaved: String
+        get() = localStorage.loginPref
+
     override val messages: Flow<ChatMessage>
         get() = chatSocket.messages.map {
             ChatMessage(
@@ -26,8 +32,11 @@ class UsersChatRepository @Inject constructor(
         }
 
     override suspend fun userLogIn(login: String) {
+        if (login.isNotBlank()) {
+            localStorage.loginPref = login
+        }
         chatSocket.connectToServerUdp()
-        chatSocket.connectToServerTcp(login = login)
+        chatSocket.connectToServerTcp(login = localStorage.loginPref)
     }
 
     override suspend fun downloadUsers() {

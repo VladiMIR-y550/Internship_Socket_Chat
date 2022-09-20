@@ -28,10 +28,14 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.state.observe(viewLifecycleOwner) {
-            binding.tvAuthStatus.text = it.authStatus
-            binding.tvInput.text = it.message
-            binding.tvInternetConnection.isVisible = it.isInternetAvailable
-            binding.pbAuthProgress.isVisible = it.isProgress
+            with(binding) {
+                tvAuthStatus.text = it.authStatus
+                tvInput.text = it.message
+                tvInternetConnection.isVisible = it.isInternetAvailable
+                pbAuthProgress.isVisible = it.isProgress
+                btnSingIn.isEnabled = !it.isProgress
+                etLoginInput.isEnabled = !it.isProgress
+            }
             if (it.isAuth) {
                 navigationToUserListScreen()
             }

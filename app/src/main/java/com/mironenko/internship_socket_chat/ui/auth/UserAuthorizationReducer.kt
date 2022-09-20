@@ -22,7 +22,16 @@ class UserAuthorizationReducer @Inject constructor() :
             )
 
             //Side effect
-            UserAuthorizationAction.None -> state
+            UserAuthorizationAction.None -> state.copy(
+                message = "Please enter your login"
+            )
+            UserAuthorizationAction.FindLogin -> state.copy(
+                message = "Find your last login"
+            )
+            UserAuthorizationAction.ConnectToServer -> state.copy(
+                isProgress = true,
+                message = "Authorization..."
+            )
             UserAuthorizationAction.Authorized -> state.copy(
                 authStatus = "Authorized",
                 isProgress = false,

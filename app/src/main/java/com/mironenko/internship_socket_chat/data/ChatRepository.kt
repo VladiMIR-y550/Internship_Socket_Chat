@@ -6,10 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
     val userId: String
+    val loginSaved: String
     val isAuthorized: Flow<Boolean>
     val users: Flow<List<User>>
     val messages: Flow<ChatMessage>
-    suspend fun userLogIn(login: String)
+    suspend fun userLogIn(login: String = "")
     suspend fun downloadUsers()
     suspend fun sendMessage(messageChat: ChatMessage)
 }
