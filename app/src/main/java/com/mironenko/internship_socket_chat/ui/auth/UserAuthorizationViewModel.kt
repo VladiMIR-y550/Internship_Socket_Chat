@@ -17,7 +17,7 @@ class UserAuthorizationViewModel @Inject constructor(
     }
 
     fun singIn() {
-        action(UserAuthorizationAction.SingIn())
+        action(UserAuthorizationAction.SingIn)
     }
 
     fun setLogin(login: String) {

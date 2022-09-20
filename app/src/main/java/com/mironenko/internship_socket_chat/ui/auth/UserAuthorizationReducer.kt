@@ -2,6 +2,7 @@ package com.mironenko.internship_socket_chat.ui.auth
 
 import com.mironenko.internship_socket_chat.base.Reducer
 import javax.inject.Inject
+import kotlin.math.log
 
 class UserAuthorizationReducer @Inject constructor() :
     Reducer<UserAuthorizationState, UserAuthorizationAction> {
