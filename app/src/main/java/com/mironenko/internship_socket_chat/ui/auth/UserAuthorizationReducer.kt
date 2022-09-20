@@ -13,7 +13,7 @@ class UserAuthorizationReducer @Inject constructor() :
         action: UserAuthorizationAction
     ): UserAuthorizationState {
         return when (action) {
-            UserAuthorizationAction.SingIn -> state.copy(
+            is UserAuthorizationAction.SingIn -> state.copy(
                 message = "Please enter your login",
                 isProgress = true
             )

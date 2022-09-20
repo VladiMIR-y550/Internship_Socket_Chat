@@ -27,9 +27,10 @@ class AuthStatusInteractor @Inject constructor(
     ): UserAuthorizationAction {
         return if (action is UserAuthorizationAction.FindLogin) {
             if (chatRepository.loginSaved.isNotBlank()) {
-                chatRepository.userLogIn()
+                UserAuthorizationAction.SingIn(chatRepository.loginSaved)
+            } else {
+                UserAuthorizationAction.None
             }
-            UserAuthorizationAction.None
         } else {
             UserAuthorizationAction.Error(IllegalArgumentException("Wrong action $action"))
         }

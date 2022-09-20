@@ -2,7 +2,7 @@ package com.mironenko.internship_socket_chat.ui.auth
 
 sealed class UserAuthorizationAction {
     object None : UserAuthorizationAction()
-    object SingIn : UserAuthorizationAction()
+    data class SingIn(val login: String = "") : UserAuthorizationAction()
 
     //Side Effect
     object Authorized : UserAuthorizationAction()
