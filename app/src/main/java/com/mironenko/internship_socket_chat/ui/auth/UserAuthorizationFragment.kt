@@ -33,8 +33,8 @@ class UserAuthorizationFragment : BaseFragment<FragmentUserAuthorizationBinding>
                 tvInput.text = it.message
                 tvInternetConnection.isVisible = it.isInternetAvailable
                 pbAuthProgress.isVisible = it.isProgress
-                btnSingIn.isEnabled = !it.isProgress
                 etLoginInput.isEnabled = !it.isProgress
+                btnSingIn.isEnabled = it.login.isNotBlank()
             }
             if (it.isAuth) {
                 navigationToUserListScreen()
