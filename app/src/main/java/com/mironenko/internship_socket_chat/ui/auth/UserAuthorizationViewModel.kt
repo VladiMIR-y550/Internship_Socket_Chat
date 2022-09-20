@@ -12,6 +12,9 @@ class UserAuthorizationViewModel @Inject constructor(
     interactors = interactors,
     reducer = UserAuthorizationReducer()
 ) {
+    init {
+        action(UserAuthorizationAction.FindLogin)
+    }
 
     fun singIn() {
         action(UserAuthorizationAction.SingIn)

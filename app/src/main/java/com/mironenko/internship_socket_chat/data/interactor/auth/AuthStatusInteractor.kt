@@ -25,10 +25,18 @@ class AuthStatusInteractor @Inject constructor(
         state: UserAuthorizationState,
         action: UserAuthorizationAction
     ): UserAuthorizationAction {
-        throw IllegalArgumentException("Wrong Action $action")
+        return if (action is UserAuthorizationAction.FindLogin) {
+            if (chatRepository.loginSaved.isNotBlank()) {
+                UserAuthorizationAction.SingIn
+            } else {
+                UserAuthorizationAction.None
+            }
+        } else {
+            UserAuthorizationAction.Error(IllegalArgumentException("Wrong action $action"))
+        }
     }
 
     override fun canHandle(action: UserAuthorizationAction): Boolean {
-        return false
+        return action is UserAuthorizationAction.FindLogin
     }
 }
