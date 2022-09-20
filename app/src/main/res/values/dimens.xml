@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="margin_16db_authorization_screen">16dp</dimen>
+    <dimen name="margin_authorization_screen_16db">16dp</dimen>
+    <dimen name="padding_screen_8dp">8dp</dimen>
+    <dimen name="background_message_radius_24dp">24dp</dimen>
+    <dimen name="text_size_user_name_20sp">20sp</dimen>
 </resources>

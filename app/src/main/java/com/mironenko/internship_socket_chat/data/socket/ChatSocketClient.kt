@@ -3,6 +3,7 @@ package com.mironenko.internship_socket_chat.data.socket
 import com.google.gson.Gson
 import com.mironenko.internship_socket_chat.data.socket.model.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import java.io.*
 import java.net.*
@@ -12,8 +13,8 @@ const val SOCKET_TIMEOUT = 10000
 const val PING_TIMEOUT = 9000L
 const val DISCONNECT_TIMEOUT = 8000L
 
-class ChatSocketClient @Inject constructor(
-) : ChatSocket {
+class ChatSocketClient @Inject constructor() : ChatSocket {
+
     private val gsonObj = Gson()
     private val clientScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var disconnectJob: Job? = null
@@ -29,9 +30,17 @@ class ChatSocketClient @Inject constructor(
     private val _users = MutableSharedFlow<List<User>>()
     override val users: Flow<List<User>> = _users.asSharedFlow()
 
+    private val _messages =
+        MutableSharedFlow<MessageDto>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    override val messages: Flow<MessageDto> = _messages.asSharedFlow()
+
     private var serverIp: String = ""
-    private var userId: String = ""
     private var userLogin: String = ""
+    private var userId = ""
+
+    override fun getUserId(): String {
+        return userId
+    }
 
     override suspend fun connectToServerUdp() {
         var isSocketAddress = false
@@ -88,6 +97,9 @@ class ChatSocketClient @Inject constructor(
                         BaseDto.Action.USERS_RECEIVED -> {
                             sharedUsers(baseDto = baseDto)
                         }
+                        BaseDto.Action.NEW_MESSAGE -> {
+                            sharedMessages(baseDto = baseDto)
+                        }
                         else -> {
                             throw IllegalArgumentException("Wrong BaseDto.Action")
                         }
@@ -96,6 +108,17 @@ class ChatSocketClient @Inject constructor(
                     e.printStackTrace()
                 }
             }
+        }
+    }
+
+    override suspend fun sendMessage(sendMessageDto: SendMessageDto) {
+        withContext(Dispatchers.IO) {
+            sendJson(
+                jsonFromBaseDto(
+                    action = BaseDto.Action.SEND_MESSAGE,
+                    sendMessageDto
+                )
+            )
         }
     }
 
@@ -110,6 +133,11 @@ class ChatSocketClient @Inject constructor(
                 )
             )
         }
+    }
+
+    private suspend fun sharedMessages(baseDto: BaseDto) {
+        val messages = gsonObj.fromJson(baseDto.payload, MessageDto::class.java)
+        _messages.emit(messages)
     }
 
     private suspend fun sharedUsers(baseDto: BaseDto) {
