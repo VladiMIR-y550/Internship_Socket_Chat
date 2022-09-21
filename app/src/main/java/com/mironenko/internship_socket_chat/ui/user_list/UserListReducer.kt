@@ -11,6 +11,10 @@ class UserListReducer : Reducer<UserListState, UserListAction> {
     override fun reduce(state: UserListState, action: UserListAction): UserListState {
         return when (action) {
             UserListAction.None -> state
+            UserListAction.Logout -> state
+            UserListAction.LoggedOut -> state.copy(
+                isLoggedOut = true
+            )
             UserListAction.LoadUsers -> state.copy(
                 isLoading = true
             )

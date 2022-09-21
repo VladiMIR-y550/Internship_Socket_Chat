@@ -10,5 +10,5 @@
     <string name="lost_internet_connection">Lost internet connection</string>
     <string name="auth_status">auth_status</string>
     <string name="send_message">send message</string>
-
+    <string name="logout">Logout</string>
 </resources>

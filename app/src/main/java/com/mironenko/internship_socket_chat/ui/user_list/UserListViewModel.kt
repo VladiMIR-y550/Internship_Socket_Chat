@@ -24,4 +24,8 @@ class UserListViewModel @Inject constructor(
             }
         }
     }
+
+    fun logout() {
+        action(UserListAction.Logout)
+    }
 }

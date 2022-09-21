@@ -21,7 +21,6 @@ class UserAuthorizationReducer @Inject constructor() :
             UserAuthorizationAction.LoggedIn -> state.copy(
                 message = "Authorization..."
             )
-
             //Side effect
             UserAuthorizationAction.None -> state.copy(
                 message = "Please enter your login"

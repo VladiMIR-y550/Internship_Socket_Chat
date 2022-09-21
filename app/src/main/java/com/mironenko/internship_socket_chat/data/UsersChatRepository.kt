@@ -1,6 +1,6 @@
 package com.mironenko.internship_socket_chat.data
 
-import com.mironenko.internship_socket_chat.data.interactor.local.LocalDataSource
+import com.mironenko.internship_socket_chat.data.local.LocalDataSource
 import com.mironenko.internship_socket_chat.data.socket.ChatSocket
 import com.mironenko.internship_socket_chat.data.socket.model.ChatMessage
 import com.mironenko.internship_socket_chat.data.socket.model.SendMessageDto
@@ -30,6 +30,11 @@ class UsersChatRepository @Inject constructor(
                 message = it.message
             )
         }
+
+    override suspend fun logout() {
+        localStorage.clearPref()
+        chatSocket.logout()
+    }
 
     override suspend fun userLogIn(login: String) {
         if (login.isNotBlank()) {

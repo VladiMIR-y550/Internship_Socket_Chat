@@ -135,6 +135,14 @@ class ChatSocketClient @Inject constructor() : ChatSocket {
         }
     }
 
+    override suspend fun logout() {
+        clientScope.coroutineContext.cancelChildren()
+        socketClose()
+        reader = null
+        writer = null
+        authorizationStatus(false)
+    }
+
     private suspend fun sharedMessages(baseDto: BaseDto) {
         val messages = gsonObj.fromJson(baseDto.payload, MessageDto::class.java)
         _messages.emit(messages)
