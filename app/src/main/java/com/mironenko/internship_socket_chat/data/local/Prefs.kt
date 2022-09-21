@@ -1,4 +1,4 @@
-package com.mironenko.internship_socket_chat.data.interactor.local
+package com.mironenko.internship_socket_chat.data.local
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
@@ -13,6 +13,12 @@ class Prefs @Inject constructor(
         set(value) = sharedPreferences.edit {
             putString(SAVED_USER_LOGIN, value)
         }
+
+    override fun clearPref() {
+        sharedPreferences.edit {
+            clear()
+        }
+    }
 }
 
 private const val SAVED_USER_LOGIN = "SAVED USER LOGIN"

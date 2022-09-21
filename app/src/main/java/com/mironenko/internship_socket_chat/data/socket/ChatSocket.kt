@@ -10,6 +10,7 @@ interface ChatSocket {
     val users: Flow<List<User>>
     val messages: Flow<MessageDto>
     fun getUserId(): String
+    suspend fun logout()
     suspend fun connectToServerUdp()
     suspend fun connectToServerTcp(login: String)
     suspend fun sendGetUsers()

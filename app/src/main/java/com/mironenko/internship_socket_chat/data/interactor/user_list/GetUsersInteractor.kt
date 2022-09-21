@@ -18,15 +18,24 @@ class GetUsersInteractor @Inject constructor(
         }
 
     override suspend fun invoke(state: UserListState, action: UserListAction): UserListAction {
-        return if (action is UserListAction.LoadUsers) {
-            chatRepository.downloadUsers()
-            UserListAction.None
-        } else {
-            UserListAction.Error(IllegalArgumentException("Wrong action $action"))
+        return when (action) {
+            is UserListAction.LoadUsers -> {
+                chatRepository.downloadUsers()
+                UserListAction.None
+            }
+            is UserListAction.Logout -> {
+                chatRepository.logout()
+                UserListAction.LoggedOut
+            }
+            else -> UserListAction.Error(IllegalArgumentException("Wrong action $action"))
         }
     }
 
     override fun canHandle(action: UserListAction): Boolean {
-        return action is UserListAction.LoadUsers
+        return when (action) {
+            is UserListAction.LoadUsers -> true
+            is UserListAction.Logout -> true
+            else -> false
+        }
     }
 }
