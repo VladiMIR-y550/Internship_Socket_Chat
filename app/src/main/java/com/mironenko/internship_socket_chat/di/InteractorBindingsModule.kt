@@ -6,6 +6,7 @@ import com.mironenko.internship_socket_chat.data.interactor.auth.GetUserAuthoriz
 import com.mironenko.internship_socket_chat.data.interactor.chat.GetNewMessageInteractor
 import com.mironenko.internship_socket_chat.data.interactor.chat.SendMessageInteractor
 import com.mironenko.internship_socket_chat.data.interactor.user_list.GetUsersInteractor
+import com.mironenko.internship_socket_chat.data.interactor.user_list.LogoutInteractor
 import com.mironenko.internship_socket_chat.ui.auth.UserAuthorizationAction
 import com.mironenko.internship_socket_chat.ui.auth.UserAuthorizationState
 import com.mironenko.internship_socket_chat.ui.chat.UserChatAction
@@ -38,6 +39,12 @@ interface InteractorBindingsModule {
     @IntoSet
     fun bindUserListInteractor(
         getUsersInteractor: GetUsersInteractor
+    ): Interactor<UserListState, UserListAction>
+
+    @Binds
+    @IntoSet
+    fun bindLogoutInteractor(
+        logoutInteractor: LogoutInteractor
     ): Interactor<UserListState, UserListAction>
 
     @Binds
