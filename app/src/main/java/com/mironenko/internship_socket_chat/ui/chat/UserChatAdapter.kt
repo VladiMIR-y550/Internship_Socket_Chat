@@ -5,13 +5,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.mironenko.internship_socket_chat.data.socket.model.ChatMessage
 import com.mironenko.internship_socket_chat.databinding.LayoutReceivedMessageItemBinding
 import com.mironenko.internship_socket_chat.databinding.LayoutSendMessageItemBinding
+import com.mironenko.internship_socket_chat.domain.models.ChatMessage
 
 class UserChatAdapter(
     private val isSentMessage: (author: String) -> Boolean
-) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(MessageDiffCallback()) {
+) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(
+    MessageDiffCallback()
+) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -59,12 +61,19 @@ class UserChatAdapter(
         }
     }
 
-    class MessageDiffCallback : DiffUtil.ItemCallback<ChatMessage>() {
-        override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
+    class MessageDiffCallback :
+        DiffUtil.ItemCallback<ChatMessage>() {
+        override fun areItemsTheSame(
+            oldItem: ChatMessage,
+            newItem: ChatMessage
+        ): Boolean {
             return oldItem.messageUUID == newItem.messageUUID
         }
 
-        override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
+        override fun areContentsTheSame(
+            oldItem: ChatMessage,
+            newItem: ChatMessage
+        ): Boolean {
             return oldItem == oldItem
         }
     }

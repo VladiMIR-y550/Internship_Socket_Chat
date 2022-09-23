@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mironenko.internship_socket_chat.base.BaseFragment
 import com.mironenko.internship_socket_chat.databinding.FragmentUserChatBinding
+import com.mironenko.internship_socket_chat.domain.states.UserChatState
 import com.mironenko.internship_socket_chat.util.ARG_RECEIVER_ID
 import dagger.hilt.android.AndroidEntryPoint
 

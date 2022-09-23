@@ -1,7 +1,6 @@
 package com.mironenko.internship_socket_chat.ui.user_list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -10,8 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mironenko.internship_socket_chat.R
 import com.mironenko.internship_socket_chat.base.BaseFragment
-import com.mironenko.internship_socket_chat.data.socket.model.User
 import com.mironenko.internship_socket_chat.databinding.FragmentUserListBinding
+import com.mironenko.internship_socket_chat.domain.models.User
+import com.mironenko.internship_socket_chat.domain.states.UserListState
 import com.mironenko.internship_socket_chat.ui.chat.UserChatFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,8 +25,8 @@ class UserListFragment : BaseFragment<FragmentUserListBinding>(), MenuProvider {
         }
     }
 
-    override val viewBindingProvider: (LayoutInflater, ViewGroup?) -> FragmentUserListBinding =
-        { inflater, container ->
+    override val viewBindingProvider: (LayoutInflater, ViewGroup?) -> FragmentUserListBinding = {
+            inflater, container ->
             FragmentUserListBinding.inflate(inflater, container, false)
         }
 

@@ -1,7 +1,10 @@
 package com.mironenko.internship_socket_chat.ui.user_list
 
 import com.mironenko.internship_socket_chat.base.BaseViewModel
-import com.mironenko.internship_socket_chat.base.Interactor
+import com.mironenko.internship_socket_chat.domain.actions.UserListAction
+import com.mironenko.internship_socket_chat.domain.base.Interactor
+import com.mironenko.internship_socket_chat.domain.reducers.UserListReducer
+import com.mironenko.internship_socket_chat.domain.states.UserListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.mironenko.internship_socket_chat.data.socket.model.User
 import com.mironenko.internship_socket_chat.databinding.LayoutUserItemBinding
+import com.mironenko.internship_socket_chat.domain.models.User
 
 class UserListAdapter(
-    private val onItemClicked:(User) -> Unit
+    private val onItemClicked: (User) -> Unit
 ) : ListAdapter<User, UserListAdapter.UserViewHolder>(UserDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
@@ -29,7 +29,7 @@ class UserListAdapter(
         fun bind(user: User) {
             with(binding) {
                 tvUserName.text = user.name
-                root.setOnClickListener{
+                root.setOnClickListener {
                     onItemClicked(user)
                 }
             }
