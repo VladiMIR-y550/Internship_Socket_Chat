@@ -5,6 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mironenko.internship_socket_chat.domain.base.Interactor
+import com.mironenko.internship_socket_chat.domain.base.Reducer
+import com.mironenko.internship_socket_chat.domain.base.SideEffectInteractor
 import com.mironenko.internship_socket_chat.util.delegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
